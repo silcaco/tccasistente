@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+    <html lang="pt-br">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Online</title>
+    <link href="https://fonts.googleapis.com/css?family=Inter:400,600,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    </head>
+    <body>
+    <header class="header hidden" id="header">
+        <span class="logo">Agenda Online</span>
+        <nav>
+        <button id="nav-inicio" class="active">Início</button>
+        <button id="nav-calendario">Calendário</button>
+        <button id="nav-tarefas">Tarefas</button>
+        <button id="nav-conquistas">Conquistas</button>
+        <button id="nav-premium">Premium</button>
+        <button id="nav-sobre">Sobre</button>
+        <button id="nav-config">Configurações</button>
+        </nav>
+        <div class="user" id="userLabel"></div>
+    </header>
+
+    <div class="centered-page" id="authPage">
+        <div class="auth-container" id="loginBox">
+        <div class="logo" style="margin-bottom:8px; text-align:center;">
+            <span>Agenda Online</span>
+        </div>
+        <div class="auth-title">Entrar na sua conta</div>
+        <form class="auth-form" id="loginForm" autocomplete="off">
+            <div>
+            <label for="loginEmail">E-mail</label>
+            <input type="email" id="loginEmail" placeholder="Seu e-mail" required>
+            </div>
+            <div>
+            <label for="loginSenha">Senha</label>
+            <input type="password" id="loginSenha" placeholder="Sua senha" required>
+            </div>
+            <div class="auth-links">
+            <span></span>
+            <a href="#" id="toReset">Esqueci a senha</a>
+            </div>
+            <button type="submit" class="btn-auth">Entrar</button>
+        </form>
+        <div class="auth-bottom">
+            Não tem uma conta?
+            <a href="#" id="toRegister">Registrar</a>
+        </div>
+        <div class="msg" id="loginMsg"></div> </div>
+
+        <div class="auth-container hidden" id="registerBox">
+        <div class="auth-title">Criar nova conta</div>
+        <form class="auth-form" id="registerForm" autocomplete="off">
+            <div>
+            <label for="regNome">Nome</label>
+            <input type="text" id="regNome" placeholder="Seu nome" required>
+            </div>
+            <div>
+            <label for="regEmail">E-mail</label>
+            <input type="email" id="regEmail" placeholder="Seu e-mail" required>
+            </div>
+            <div>
+            <label for="regSenha">Senha</label>
+            <input type="password" id="regSenha" placeholder="Crie uma senha" required>
+            </div>
+            <button type="submit" class="btn-auth">Cadastrar</button>
+        </form>
+        <div class="auth-bottom">
+            Já tem conta?
+            <a href="#" id="toLogin1">Entrar</a>
+        </div>
+        <div class="msg" id="registerMsg"></div> </div>
+
+        <div class="auth-container hidden" id="resetBox">
+        <div class="auth-title">Recuperar senha</div>
+        <form class="auth-form" id="resetForm" autocomplete="off">
+            <div>
+            <label for="resetEmail">E-mail</label>
+            <input type="email" id="resetEmail" placeholder="Seu e-mail cadastrado" required>
+            </div>
+            <button type="submit" class="btn-auth">Enviar link</button>
+        </form>
+        <div class="auth-bottom">
+            Lembrou a senha?
+            <a href="#" id="toLogin2">Entrar</a>
+        </div>
+        <div class="msg" id="resetMsg"></div> </div>
+    </div>
+
+    <main class="container hidden" id="mainPage">
+        <section id="inicioPage">
+            <div class="page-header">
+                <h2>Bem-vindo(a) à sua Agenda Online</h2>
+                <button id="exportPdfBtn" class="btn-secondary premium-only hidden" style="cursor: pointer; padding: 8px 16px;">Exportar PDF</button>
+            </div>
+        <p>Gerencie seus <b>compromissos, tarefas e eventos</b> em um só lugar. Veja seus próximos eventos e tarefas abaixo.</p>
+        <div class="flex-row">
+            <div class="panel">
+            <h3>Próximos Eventos</h3>
+            <ul class="event-list" id="upcomingEvents"></ul>
+            <form class="add-form" id="addEventForm">
+                <input type="text" id="eventTitle" placeholder="Título do evento" required>
+                <input type="date" id="eventDate" required>
+                <input type="time" id="eventTime" required>
+                <textarea id="eventDesc" placeholder="Descrição (opcional)" rows="2"></textarea>
+                <button type="submit">Adicionar Evento</button>
+            </form>
+            </div>
+            <div class="panel">
+            <h3>Minhas Tarefas</h3>
+            <div class="tasks-filter" id="tasksFilter">
+                <button type="button" class="active" data-filter="all">Todas</button>
+                <button type="button" data-filter="today">Hoje</button>
+                <button type="button" data-filter="week">Semana</button>
+                <button type="button" data-filter="month">Mês</button>
+            </div>
+            <ul class="task-list" id="upcomingTasks"></ul>
+            <form class="add-form" id="addTaskForm">
+                <input type="text" id="taskTitle" placeholder="Descrição da tarefa" required>
+                <input type="date" id="taskDate" required>
+                <select id="taskPriority" required>
+                <option value="normal">Prioridade: Normal</option>
+                <option value="alta">Prioridade: Alta</option>
+                <option value="baixa">Prioridade: Baixa</option>
+                </select>
+                <button type="submit">Adicionar Tarefa</button>
+            </form>
+            </div>
+        </div>
+        </section>
+
+        <section id="calendarioPage" class="hidden">
+        <h2>Calendário</h2>
+        <div class="calendar-section">
+            <div class="calendar-controls">
+            <button id="prevMonthBtn">&lt;</button>
+            <span id="calendarMonthYear"></span>
+            <button id="nextMonthBtn">&gt;</button>
+            </div>
+            <table class="calendar-table" id="calendarTable"></table>
+            
+            <div id="dayDetails" class="day-details hidden">
+                <h3 id="dayDetailsTitle">Detalhes do Dia</h3>
+                <div id="dayDetailsContent"></div>
+                <button id="closeDayDetails" class="btn-auth" style="margin-top: 10px;">Fechar</button>
+            </div>
+        </div>
+        </section>
+
+        <section id="tarefasPage" class="hidden">
+        <h2>Minhas Tarefas</h2>
+        <div class="tasks-filter" id="tasksFilter2">
+            <button type="button" class="active" data-filter="all">Todas</button>
+            <button type="button" data-filter="today">Hoje</button>
+            <button type="button" data-filter="week">Semana</button>
+            <button type="button" data-filter="month">Mês</button>
+        </div>
+        <ul class="task-list" id="allTasksList"></ul>
+        <form class="add-form" id="addTaskForm2">
+            <input type="text" id="taskTitle2" placeholder="Descrição da tarefa" required>
+            <input type="date" id="taskDate2" required>
+            <select id="taskPriority2" required>
+            <option value="normal">Prioridade: Normal</option>
+            <option value="alta">Prioridade: Alta</option>
+            <option value="baixa">Prioridade: Baixa</option>
+            </select>
+            <button type="submit">Adicionar Tarefa</button>
+        </form>
+        </section>
+        
+        <section id="conquistasPage" class="hidden">
+            <h2>🏆 Suas Conquistas</h2>
+            <p>Ganhe distintivos por usar a Agenda Online e compartilhar com amigos.</p>
+            
+            <div id="achievementsList" class="achievements-grid">
+                <div class="achievement-card placeholder">Carregando conquistas...</div>
+            </div>
+        </section>
+
+        <section id="premiumPage" class="hidden">
+            <h2>Agenda Premium</h2>
+            
+            <div id="premiumStatusContainer" class="premium-status-display hidden">
+                </div>
+            
+            <div class="premium-container" id="premiumCardsContainer">
+                <div class="premium-card">
+                    <h3>Plano Grátis</h3>
+                    <div class="price">R$ 0<span class="price-period">/mês</span></div>
+                    <ul class="features-list">
+                        <li><span class="check-icon">✓</span>Até 5 eventos</li>
+                        <li><span class="check-icon">✓</span>Até 10 tarefas</li>
+                        <li><span class="check-icon">✓</span>Acesso ao Calendário</li>
+                        <li class="disabled"><span class="check-icon">❌</span>Exportar dados para PDF</li>
+                        <li class="disabled"><span class="check-icon">❌</span>Temas de Cores</li>
+                        <li class="disabled"><span class="check-icon">❌</span>Suporte Prioritário</li>
+                    </ul>
+                    <button class="btn-secondary" disabled>Seu Plano Atual</button>
+                </div>
+                <div class="premium-card featured">
+                    <div class="featured-badge">Recomendado</div>
+                    <h3>Plano Premium</h3>
+                    <div class="price">R$ 9,90<span class="price-period">/mês</span></div>
+                    <ul class="features-list">
+                        <li><span class="check-icon">✓</span>Eventos ilimitados</li>
+                        <li><span class="check-icon">✓</span>Tarefas ilimitadas</li>
+                        <li><span class="check-icon">✓</span>Acesso ao Calendário</li>
+                        <li><span class="check-icon">✓</span>Exportar dados para PDF</li>
+                        <li><span class="check-icon">✓</span>Temas de Cores</li>
+                        <li><span class="check-icon">✓</span>Suporte Prioritário</li>
+                    </ul>
+                    <button class="btn-auth" id="subscribeBtn">Assinar Agora</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="configPage" class="hidden">
+        <h2>Configurações</h2>
+        <div class="settings-container">
+            <div class="settings-column">
+                <h3>Geral</h3>
+                <ul class="settings-list">
+                    <li id="planStatus">
+                        <label>Seu Plano</label>
+                        <span class="plan-badge free">GRÁTIS</span>
+                    </li>
+                    <li>
+                        <label for="darkMode">Modo escuro</label>
+                        <input type="checkbox" id="darkMode">
+                    </li>
+                    <li>
+                        <label for="emailNotif">Notificações por e-mail</label>
+                        <input type="checkbox" id="emailNotif">
+                    </li>
+                    <li>
+                        <button class="logout-btn" id="logoutBtn">Sair da conta</button>
+                    </li>
+                    <li>
+                        <label style="color: var(--error);">Excluir Conta</label>
+                        <button class="logout-btn" id="deleteAccountBtn">Excluir Minha Conta</button>
+                    </li>
+                </ul>
+
+                <div class="invite-container">  
+                    <label for="inviteLinkDisplay">Convide seus amigos:</label>
+                    <div class="input-group">
+                        <input type="text" id="inviteLinkDisplay" readonly value="Carregando seu link...">
+                        <button class="btn-auth" id="copyInviteLinkBtn" style="padding: 10px 15px; margin-left: 8px;">Copiar</button>
+                    </div>
+                    <div id="inviteStats" style="margin-top: 10px;">
+                        <p>Amigos convidados: <span id="referralCount">0</span></p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="settings-column premium-only hidden">
+                <h3>Funcionalidades Premium</h3>
+                <div id="themesContainer">
+                    <label>Tema da Agenda</label>
+                    <div class="theme-selector">
+                        <div class="theme-swatch" data-theme="default" style="background: #3b82f6;"></div>
+                        <div class="theme-swatch" data-theme="sunset" style="background: #f97316;"></div>
+                        <div class="theme-swatch" data-theme="forest" style="background: #16a34a;"></div>
+                        <div class="theme-swatch" data-theme="lavender" style="background: #8b5cf6;"></div>
+                    </div>
+                </div>
+                <div id="supportContainer">
+                    <label>Suporte Prioritário</label>
+                    <form id="supportForm" class="add-form">
+                        <textarea id="supportMessage" placeholder="Digite sua dúvida ou problema..." rows="3" required></textarea>
+                        <button type="submit">Enviar Mensagem</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        </section>
+        
+        <section id="sobrePage" class="hidden">
+            <h2>Sobre a Agenda Online</h2>
+            <p>Este projeto foi desenvolvido como um Trabalho de Conclusão de Curso (TCC), com o objetivo de criar uma ferramenta de organização pessoal que seja ao mesmo tempo poderosa, intuitiva e agradável de usar. A Agenda Online centraliza seus eventos, tarefas e calendário em um único lugar, acessível de qualquer dispositivo.</p>
+            
+            <div class="testimonials-container">
+                <h3>O que nossos usuários dizem</h3>
+                <div class="testimonial-card">
+                    <blockquote>"Finalmente uma agenda que é simples e funciona! Consigo organizar minha semana inteira em minutos. O calendário visual é fantástico."</blockquote>
+                    <span class="author">- Ana Clara, Estudante</span>
+                </div>
+                <div class="testimonial-card">
+                    <blockquote>"Uso a Agenda Online para gerenciar as tarefas do meu time e os meus compromissos pessoais. A separação entre eventos e tarefas é muito útil. Recomendo!"</blockquote>
+                    <span class="author">- Ricardo Mendes, Empreendedor</span>
+                </div>
+                <div class="testimonial-card">
+                    <blockquote>"O design é limpo e a navegação é super rápida. Gosto de como é fácil adicionar uma nova tarefa ou um evento. Virou minha ferramenta principal de organização."</blockquote>
+                    <span class="author">- Juliana Costa, Designer</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="adminPage" class="hidden">
+            <h2>Página de Administração</h2>
+            
+            <div id="adminUserListContainer">
+                <p>Lista de usuários cadastrados. Clique em "Ver Detalhes" para inspecionar os dados de um usuário.</p>
+                <ul id="adminUsersList" class="settings-list" style="max-width: none;"></ul>
+            </div>
+            
+            <div id="adminUserDetails" class="hidden">
+                </div>
+        </section>
+
+    </main>
+
+    <div class="modal-overlay hidden" id="paymentModalOverlay">
+        <div class="payment-modal">
+            <div id="paymentFormContainer">
+                <h3>Assinatura Premium</h3>
+                <p>Preencha os dados para concluir a assinatura.</p>
+                <form id="paymentForm" class="auth-form" autocomplete="off">
+                    <div>
+                        <label for="cardName">Nome no Cartão</label>
+                        <input type="text" id="cardName" placeholder="Seu nome completo" required>
+                    </div>
+                    <div>
+                        <label for="cardNumber">Número do Cartão</label>
+                        <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" required>
+                    </div>
+                    <button type="submit" class="btn-auth">Comprar (R$ 9,90)</button>
+                    <button type="button" class="btn-secondary" id="cancelPaymentBtn" style="cursor: pointer;">Cancelar</button>
+                </form>
+            </div>
+            <div id="successAnimationContainer" class="hidden">
+                <div class="success-checkmark">
+                    <div class="check-icon">
+                        <span class="icon-line line-tip"></span>
+                        <span class="icon-line line-long"></span>
+                        <div class="icon-circle"></div>
+                        <div class="icon-fix"></div>
+                    </div>
+                </div>
+                <h2>Compra Realizada com Sucesso!</h2>
+                <p>Bem-vindo(a) ao Premium!</p>
+            </div>  
+        </div>
+    </div>
+
+   <div id="virtualAssistantWidget" class="assistant-widget">
+        <button id="assistantButton" class="assistant-button">
+            <img src="https://w7.pngwing.com/pngs/870/748/png-transparent-call-center-agent-logo-virtual-assistant-computer-icons-personal-assistant-business-management-support-blue-company-text-thumbnail.png" alt="Assistente Virtual" class="assistant-icon">
+        </button>
+        
+        <div id="assistantChatbox" class="assistant-chatbox">
+            <div class="chat-header">
+                <img src="https://w7.pngwing.com/pngs/870/748/png-transparent-call-center-agent-logo-virtual-assistant-computer-icons-personal-assistant-business-management-support-blue-company-text-thumbnail.png" alt="Logo Agenda Online" class="logo-mini"> Assistente Agenda Online
+                <button id="closeChatBtn" class="close-chat-btn">✖</button>
+            </div>
+            <div class="chat-body" id="chatBody">
+                <div class="message assistant-message">Olá! Eu sou a sua Assistente Virtual da Agenda Online. Pergunte-me qualquer coisa!</div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="Digite sua pergunta...">
+                <button id="sendMessageBtn">Enviar</button>
+            </div>
+        </div>
+    </div>
+<footer class="footer">
+        © 2025 Agenda Online - Projeto TCC. Todos os direitos reservados.
+    </footer>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+    
+    <script src="script.js"></script> 
+    </body>
+</html>
